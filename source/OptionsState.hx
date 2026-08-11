@@ -14,9 +14,6 @@ import flixel.util.FlxColor;
 import flixel.util.FlxStringUtil;
 import lime.utils.Assets;
 import flixel.FlxSubState;
-import flash.text.TextField;
-import flixel.FlxG;
-import flixel.FlxSprite;
 import flixel.util.FlxSave;
 import haxe.Json;
 import flixel.tweens.FlxEase;
@@ -28,7 +25,6 @@ import Controls;
 
 using StringTools;
 
-// TO DO: Redo the menu creation system for not being as dumb
 class OptionsState extends MusicBeatState
 {
 	var options:Array<String> = ['Controls', 'Preferences'];
@@ -59,7 +55,21 @@ class OptionsState extends MusicBeatState
 			optionText.y += (100 * (i - (options.length / 2))) + 50;
 			grpOptions.add(optionText);
 		}
+
+		#if android
+		var tipText:FlxText = new FlxText(10, FlxG.height - 24, 0, 'Press C to customize your android controls', 16);
+		tipText.setFormat(Paths.font('vcr.ttf'), 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		tipText.borderSize = 2.4;
+		tipText.scrollFactor.set();
+		add(tipText);
+		#end
+
 		changeSelection();
+
+		#if android
+		addVirtualPad(UP_DOWN, A_B_C);
+		virtualPad.y = -24;
+		#end
 
 		super.create();
 	}
@@ -68,6 +78,11 @@ class OptionsState extends MusicBeatState
 		super.closeSubState();
 		ClientPrefs.saveSettings();
 		changeSelection();
+
+		#if android
+		addVirtualPad(UP_DOWN, A_B_C);
+		virtualPad.y = -24;
+		#end
 	}
 
 	override function update(elapsed:Float) {
@@ -91,14 +106,26 @@ class OptionsState extends MusicBeatState
 			}
 
 			switch(options[curSelected]) {
-
 				case 'Controls':
+					#if android
+					removeVirtualPad();
+					#end
 					openSubState(new ControlsSubstate());
 
 				case 'Preferences':
+					#if android
+					removeVirtualPad();
+					#end
 					openSubState(new PreferencesSubstate());
 			}
 		}
+
+		#if android
+		if (virtualPad.buttonC.justPressed) {
+			removeVirtualPad();
+			openSubState(new android.AndroidControlsSubState());
+		}
+		#end
 	}
 
 	function changeSelection(change:Int = 0) {
@@ -119,6 +146,7 @@ class OptionsState extends MusicBeatState
 				item.alpha = 1;
 			}
 		}
+		FlxG.sound.play(Paths.sound('scrollMenu'));
 	}
 }
 
@@ -192,6 +220,10 @@ class ControlsSubstate extends MusicBeatSubstate {
 			}
 		}
 		changeSelection();
+
+		#if android
+		addVirtualPad(UP_DOWN, A_B);
+		#end
 	}
 
 	var leaving:Bool = false;
@@ -393,7 +425,6 @@ class ControlsSubstate extends MusicBeatSubstate {
 			}
 		}
 
-
 		var bullShit:Int = 0;
 		for (i in 0...grpInputs.length) {
 			grpInputs[i].alpha = 0.6;
@@ -430,7 +461,6 @@ class ControlsSubstate extends MusicBeatSubstate {
 }
 
 
-
 class PreferencesSubstate extends MusicBeatSubstate
 {
 	private static var curSelected:Int = 0;
@@ -453,7 +483,7 @@ class PreferencesSubstate extends MusicBeatSubstate
 		'Gore',
 		'Improved Hold Renderer',
 		#if !html5
-		'Framerate', //Apparently 120FPS isn't correctly supported on Browser? Probably it has some V-Sync shit enabled by default, idk
+		'Framerate',
 		#end
 		'GAMEPLAY',
 		'Downscroll',
@@ -485,7 +515,6 @@ class PreferencesSubstate extends MusicBeatSubstate
 	public function new()
 	{
 		super();
-		// avoids lagspikes while scrolling through menus!
 		showCharacter = new Character(840, 170, 'bf', true);
 		showCharacter.setGraphicSize(Std.int(showCharacter.width * 0.8));
 		showCharacter.updateHitbox();
@@ -553,6 +582,10 @@ class PreferencesSubstate extends MusicBeatSubstate
 		}
 		changeSelection();
 		reloadValues();
+
+		#if android
+		addVirtualPad(UP_DOWN, A_B);
+		#end
 	}
 
 	var nextAccept:Int = 5;
@@ -693,7 +726,7 @@ class PreferencesSubstate extends MusicBeatSubstate
 
 					case 'Note Delay':
 						var mult:Int = 1;
-						if(holdTime > 1.5) { //Double speed after 1.5 seconds holding
+						if(holdTime > 1.5) {
 							mult = 2;
 						}
 						ClientPrefs.noteOffset += add * mult;
@@ -753,137 +786,4 @@ class PreferencesSubstate extends MusicBeatSubstate
 				daText = "If unchecked, your mom won't be angry at you.";
 			case 'Violence':
 				daText = "If unchecked, you won't get disgusted as frequently.";
-			case 'Custom Scroll Speed'://for Joseph -bbpanzu
-				daText = "Leave unchecked for chart-dependent scroll speed";
-			case 'Scroll Speed':
-				daText = "Arrow speed (Custom must be enabled)";
-			case 'Note Size':
-				daText = "Size of notes and stuff";
-			case 'Note Splashes':
-				daText = "If unchecked, hitting \"Sick!\" notes won't show particles.";
-			case 'Flashing Lights':
-				daText = "Uncheck this if you're sensitive to flashing lights!";
-			case 'Gore':
-				daText = "Uncheck this if you're senitive to gore";
-			case 'Improved Hold Renderer':
-				daText = "Check this if you't want to use the improved hold renderer by 4mbr0s3 2.\nMay cause lag, but allows hold notes to bend";
-			case 'Camera Zooms':
-				daText = "If unchecked, the camera won't zoom in on a beat hit.";
-			case 'Hide HUD':
-				daText = "If checked, hides most HUD elements.";
-			case 'Hide Song Length':
-				daText = "If checked, the bar showing how much time is left\nwill be hidden.";
-		}
-		descText.text = daText;
-
-		var bullShit:Int = 0;
-
-		for (item in grpOptions.members) {
-			item.targetY = bullShit - curSelected;
-			bullShit++;
-
-			if(!unselectableCheck(bullShit-1)) {
-				item.alpha = 0.6;
-				if (item.targetY == 0) {
-					item.alpha = 1;
-				}
-
-				for (j in 0...checkboxArray.length) {
-					var tracker:FlxSprite = checkboxArray[j].sprTracker;
-					if(tracker == item) {
-						checkboxArray[j].alpha = item.alpha;
-						break;
-					}
-				}
-			}
-		}
-		for (i in 0...grpTexts.members.length) {
-			var text:AttachedText = grpTexts.members[i];
-			if(text != null) {
-				text.alpha = 0.6;
-				if(textNumber[i] == curSelected) {
-					text.alpha = 1;
-				}
-			}
-		}
-
-		showCharacter.visible = (options[curSelected] == 'Anti-Aliasing');
-		FlxG.sound.play(Paths.sound('scrollMenu'));
-	}
-
-	function reloadValues() {
-		for (i in 0...checkboxArray.length) {
-			var checkbox:CheckboxThingie = checkboxArray[i];
-			if(checkbox != null) {
-				var daValue:Bool = false;
-				switch(options[checkboxNumber[i]]) {
-					case 'FPS Counter':
-						daValue = ClientPrefs.showFPS;
-					case 'Low Quality':
-						daValue = ClientPrefs.lowQuality;
-					case 'Anti-Aliasing':
-						daValue = ClientPrefs.globalAntialiasing;
-					case 'Note Splashes':
-						daValue = ClientPrefs.noteSplashes;
-					case 'Flashing Lights':
-						daValue = ClientPrefs.flashing;
-					case 'Gore':
-						daValue = ClientPrefs.gore;
-					case 'Improved Hold Renderer':
-						daValue = ClientPrefs.schmovin;
-					case 'Downscroll':
-						daValue = ClientPrefs.downScroll;
-					case 'Middlescroll':
-						daValue = ClientPrefs.middleScroll;
-					case 'Ghost Tapping':
-						daValue = ClientPrefs.ghostTapping;
-					case 'Swearing':
-						daValue = ClientPrefs.cursing;
-					case 'Custom Scroll Speed':
-						daValue = ClientPrefs.scroll;
-					case 'Violence':
-						daValue = ClientPrefs.violence;
-					case 'Camera Zooms':
-						daValue = ClientPrefs.camZooms;
-					case 'Hide HUD':
-						daValue = ClientPrefs.hideHud;
-					case 'Persistent Cached Data':
-						daValue = ClientPrefs.imagesPersist;
-					case 'Hide Song Length':
-						daValue = ClientPrefs.hideTime;
-				}
-				checkbox.daValue = daValue;
-			}
-		}
-		for (i in 0...grpTexts.members.length) {
-			var text:AttachedText = grpTexts.members[i];
-			if(text != null) {
-				var daText:String = '';
-				switch(options[textNumber[i]]) {
-					case 'Framerate':
-						daText = '' + ClientPrefs.framerate;
-					case 'Note Delay':
-						daText = ClientPrefs.noteOffset + 'ms';
-					case 'Note Size':
-						daText = FlxStringUtil.formatMoney(ClientPrefs.noteSize) + 'x';
-						if (ClientPrefs.noteSize == 0.7) daText += "(Default)";
-					case 'Scroll Speed':
-						daText = ClientPrefs.speed+"";
-				}
-				var lastTracker:FlxSprite = text.sprTracker;
-				text.sprTracker = null;
-				text.changeText(daText);
-				text.sprTracker = lastTracker;
-			}
-		}
-	}
-
-	private function unselectableCheck(num:Int):Bool {
-		for (i in 0...unselectableOptions.length) {
-			if(options[num] == unselectableOptions[i]) {
-				return true;
-			}
-		}
-		return options[num] == null || options[num].length < 1;
-	}
-}
+	
