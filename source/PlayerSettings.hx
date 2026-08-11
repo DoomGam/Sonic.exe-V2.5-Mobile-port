@@ -7,6 +7,7 @@ import flixel.util.FlxSignal;
 
 // import ui.DeviceManager;
 // import props.Player;
+
 class PlayerSettings
 {
 	static public var numPlayers(default, null) = 0;
@@ -33,13 +34,13 @@ class PlayerSettings
 	// public var avatar:Player;
 	// public var camera(get, never):PlayCamera;
 
-	function new(id, scheme)
+	function new(id:Int, scheme:KeyboardScheme)
 	{
 		this.id = id;
 		this.controls = new Controls('player$id', scheme);
 	}
 
-	public function setKeyboardScheme(scheme)
+	public function setKeyboardScheme(scheme:KeyboardScheme)
 	{
 		controls.setKeyboardScheme(scheme);
 	}
@@ -71,7 +72,7 @@ class PlayerSettings
 				if (player2.avatar == null)
 					settings = player2;
 				else
-					throw throw 'Invalid number of players: ${numPlayers + 1}';
+					throw 'Invalid number of players: ${numPlayers + 1}';
 			}
 			++numAvatars;
 			settings.avatar = avatar;
@@ -113,8 +114,8 @@ class PlayerSettings
 
 			onAvatarRemove.dispatch(avatar.settings);
 		}
+	*/
 
-	 */
 	static public function init():Void
 	{
 		if (player1 == null)
@@ -123,6 +124,7 @@ class PlayerSettings
 			++numPlayers;
 		}
 
+		#if !mobile
 		var numGamepads = FlxG.gamepads.numActiveGamepads;
 		if (numGamepads > 0)
 		{
@@ -143,15 +145,16 @@ class PlayerSettings
 
 			var gamepad = FlxG.gamepads.getByID(1);
 			if (gamepad == null)
-				throw 'Unexpected null gamepad. id:0';
+				throw 'Unexpected null gamepad. id:1';
 
 			player2.controls.addDefaultGamepad(1);
 		}
+		#end
 
 		// DeviceManager.init();
 	}
 
-	static public function reset()
+	static public function reset():Void
 	{
 		player1 = null;
 		player2 = null;
