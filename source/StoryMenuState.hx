@@ -1,6 +1,5 @@
 package;
 
-import flixel.effects.FlxFlicker;
 #if desktop
 import Discord.DiscordClient;
 #end
@@ -8,6 +7,7 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxSubState;
 import flixel.addons.transition.FlxTransitionableState;
+import flixel.effects.FlxFlicker;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.group.FlxGroup;
@@ -23,57 +23,42 @@ using StringTools;
 
 class StoryMenuState extends MusicBeatState
 {
-	// Wether you have to beat the previous week for playing this one
-	// Not recommended, as people usually download your mod for, you know,
-	// playing just the modded week then delete it.
-	// defaults to True
 	public static var weekCompleted:Map<String, Bool> = new Map<String, Bool>();
 
 	var scoreText:FlxText;
-
 	private static var curDifficulty:Int = 1;
-
 	var txtWeekTitle:FlxText;
 	var bgSprite:FlxSprite;
 
 	private static var curWeek:Int = 0;
 
 	var txtTracklist:FlxText;
-
 	var grpWeekText:FlxTypedGroup<MenuItem>;
 	var grpWeekCharacters:FlxTypedGroup<MenuCharacter>;
-
 	var grpLocks:FlxTypedGroup<FlxSprite>;
 
 	var difficultySelectors:FlxGroup;
 	var sprDifficultyGroup:FlxTypedGroup<FlxSprite>;
-	//EXE Menu
-	var ezbg:FlxSprite;
 
+	var ezbg:FlxSprite;
 	var sprDifficulty:FlxSprite;
 	var leftArrow:FlxSprite;
 	var rightArrow:FlxSprite;
-
 	var leftArrow2:FlxSprite;
 	var rightArrow2:FlxSprite;
 
 	var curdiff:Int = 2;
-
 	var real:Int = 0;
-
 	var oneclickpls:Bool = true;
 
 	var bfIDLELAWL:StoryModeMenuBFidle;
-
 	var redBOX:FlxSprite;
-
 	var selection:Bool = false;
 
 	var songArray = ['too-slow', 'you-cant-run', 'triple-trouble'];
 
 	var staticscreen:FlxSprite;
 	var portrait:FlxSprite;
-
 
 	override function create()
 	{
@@ -84,6 +69,12 @@ class StoryMenuState extends MusicBeatState
 		if(curWeek >= WeekData.weeksList.length) curWeek = 0;
 		persistentUpdate = persistentDraw = true;
 
+		#if desktop
+		// Atualiza o Status do Discord
+		DiscordClient.changePresence("In the Menus", null);
+		#end
+
+		// Define as músicas liberadas com base no progresso do save
 		switch (FlxG.save.data.storyProgress)
 		{
 			case 1:
@@ -92,24 +83,20 @@ class StoryMenuState extends MusicBeatState
 				songArray = ['too slow', 'you cant run', 'triple trouble'];
 		}
 
-		//FlxG.sound.playMusic(Paths.music('storymodemenumusic'));
-
-		var bg:FlxSprite;
-
-		bg = new FlxSprite(0, 0);
+		// Plano de fundo Estático do Mod Sonic.EXE
+		var bg:FlxSprite = new FlxSprite(0, 0);
 		bg.frames = Paths.getSparrowAtlas('SMMStatic', 'exe');
 		bg.animation.addByPrefix('idlexd', "damfstatic", 24);
 		bg.animation.play('idlexd');
 		bg.alpha = 1;
-		bg.antialiasing = true;
+		bg.antialiasing = ClientPrefs.globalAntialiasing;
 		bg.setGraphicSize(Std.int(bg.width));
 		bg.updateHitbox();
 		add(bg);
 
-		var greyBOX:FlxSprite;
-		greyBOX = new FlxSprite(0, 0).loadGraphic(Paths.image('greybox'));
-		bg.alpha = 1;
-		greyBOX.antialiasing = true;
+		var greyBOX:FlxSprite = new FlxSprite(0, 0).loadGraphic(Paths.image('greybox'));
+		greyBOX.alpha = 1;
+		greyBOX.antialiasing = ClientPrefs.globalAntialiasing;
 		greyBOX.setGraphicSize(Std.int(bg.width));
 		greyBOX.updateHitbox();
 		add(greyBOX);
@@ -119,13 +106,13 @@ class StoryMenuState extends MusicBeatState
 		bfIDLELAWL.scale.y = .4;
 		bfIDLELAWL.screenCenter();
 		bfIDLELAWL.y += 50;
-		bfIDLELAWL.antialiasing = true;
+		bfIDLELAWL.antialiasing = ClientPrefs.globalAntialiasing;
 		bfIDLELAWL.animation.play('idleLAWLAW', true);
 		add(bfIDLELAWL);
 
 		portrait = new FlxSprite(450, 79).loadGraphic(Paths.image('fpstuff/too-slow'));
 		portrait.setGraphicSize(Std.int(portrait.width * 0.275));
-		portrait.antialiasing = true;
+		portrait.antialiasing = ClientPrefs.globalAntialiasing;
 		portrait.updateHitbox();
 		add(portrait);
 
@@ -135,22 +122,21 @@ class StoryMenuState extends MusicBeatState
 		staticscreen.animation.play('screenstaticANIM');
 		staticscreen.y += 79;
 		staticscreen.alpha = 0.3;
-		staticscreen.antialiasing = true;
+		staticscreen.antialiasing = ClientPrefs.globalAntialiasing;
 		staticscreen.setGraphicSize(Std.int(staticscreen.width * 0.275));
 		staticscreen.updateHitbox();
 		add(staticscreen);
 
-		var yellowBOX:FlxSprite;
-		yellowBOX = new FlxSprite(0, 0).loadGraphic(Paths.image('yellowbox'));
+		var yellowBOX:FlxSprite = new FlxSprite(0, 0).loadGraphic(Paths.image('yellowbox'));
 		yellowBOX.alpha = 1;
-		yellowBOX.antialiasing = true;
+		yellowBOX.antialiasing = ClientPrefs.globalAntialiasing;
 		yellowBOX.setGraphicSize(Std.int(bg.width));
 		yellowBOX.updateHitbox();
 		add(yellowBOX);
 
 		redBOX = new FlxSprite(0, 0).loadGraphic(Paths.image('redbox'));
 		redBOX.alpha = 1;
-		redBOX.antialiasing = true;
+		redBOX.antialiasing = ClientPrefs.globalAntialiasing;
 		redBOX.setGraphicSize(Std.int(bg.width));
 		redBOX.updateHitbox();
 		add(redBOX);
@@ -162,6 +148,7 @@ class StoryMenuState extends MusicBeatState
 		sprDifficulty.animation.addByPrefix('hard', 'HARD');
 		sprDifficulty.animation.addByPrefix('encore', 'NORMAL');
 		sprDifficulty.animation.play('normal');
+		sprDifficulty.antialiasing = ClientPrefs.globalAntialiasing;
 		add(sprDifficulty);
 
 		leftArrow = new FlxSprite(sprDifficulty.x - 150, sprDifficulty.y);
@@ -170,6 +157,7 @@ class StoryMenuState extends MusicBeatState
 		leftArrow.animation.addByPrefix('idle', "arrow left");
 		leftArrow.animation.addByPrefix('press', "arrow push left");
 		leftArrow.animation.play('idle');
+		leftArrow.antialiasing = ClientPrefs.globalAntialiasing;
 		add(leftArrow);
 
 		rightArrow = new FlxSprite(sprDifficulty.x + 230, sprDifficulty.y);
@@ -178,6 +166,7 @@ class StoryMenuState extends MusicBeatState
 		rightArrow.animation.addByPrefix('idle', "arrow right");
 		rightArrow.animation.addByPrefix('press', "arrow push right");
 		rightArrow.animation.play('idle');
+		rightArrow.antialiasing = ClientPrefs.globalAntialiasing;
 		add(rightArrow);
 
 		leftArrow2 = new FlxSprite(325, 136 + 5);
@@ -186,6 +175,7 @@ class StoryMenuState extends MusicBeatState
 		leftArrow2.animation.addByPrefix('idle', "arrow left");
 		leftArrow2.animation.addByPrefix('press', "arrow push left");
 		leftArrow2.animation.play('idle');
+		leftArrow2.antialiasing = ClientPrefs.globalAntialiasing;
 		add(leftArrow2);
 
 		rightArrow2 = new FlxSprite(820, 136 + 5);
@@ -194,10 +184,15 @@ class StoryMenuState extends MusicBeatState
 		rightArrow2.animation.addByPrefix('idle', "arrow right");
 		rightArrow2.animation.addByPrefix('press', "arrow push right");
 		rightArrow2.animation.play('idle');
+		rightArrow2.antialiasing = ClientPrefs.globalAntialiasing;
 		add(rightArrow2);
 
 		sprDifficulty.offset.x = 70;
 		sprDifficulty.y = leftArrow.y + 10;
+
+		#if android
+		addVirtualPad(FULL, A_B);
+		#end
 
 		super.create();
 	}
@@ -301,13 +296,13 @@ class StoryMenuState extends MusicBeatState
 				changediff(1);
 		}
 
-		if ((controls.UI_UP_P && oneclickpls) || (controls.UI_DOWN_P && oneclickpls))
-			changeSelec(); // i forgor how ifs work
+		if ((controls.UI_UP_P && oneclickpls) || (controls.UI_DOWN_P && oneclickpls) #if android || (virtualPad.buttonC.justPressed && oneclickpls) #end)
+			changeSelec();
 
 		if (controls.BACK && oneclickpls)
 		{
 			FlxG.sound.play(Paths.sound('cancelMenu'));
-			FlxG.switchState(new MainMenuState());
+			MusicBeatState.switchState(new MainMenuState());
 		}
 
 		if (controls.ACCEPT)
@@ -320,27 +315,17 @@ class StoryMenuState extends MusicBeatState
 				FlxG.sound.play(Paths.sound('confirmMenu'));
 
 				if (curdiff == 4)
+				{
+					PlayState.SONG = Song.loadFromJson('too-slow-encore', 'too-slow-encore');
+					new FlxTimer().start(1, function(tmr:FlxTimer)
 					{
-
-						PlayState.SONG = Song.loadFromJson('too-slow-encore', 'too-slow-encore');
-
-						new FlxTimer().start(1, function(tmr:FlxTimer)
-							{
-								// LoadingState.loadAndSwitchState(new PlayState(), true); //save this code for the cutsceneless build of the game
-								//var video:MP4Handler = new MP4Handler();
-							//	video.playVideo(Paths.video('tooslowcutscene1'));
-							//	video.finishCallback = function()
-								//{
-									LoadingState.loadAndSwitchState(new PlayState());
-								//}
-							});
-					}
-
+						LoadingState.loadAndSwitchState(new PlayState());
+					});
+				}
 				else if (FlxG.save.data.storyProgress == 0)
 				{
 					PlayState.storyPlaylist = ['too slow', 'you cant run', 'triple trouble'];
 					PlayState.isStoryMode = true;
-
 
 					curdiff = 3;
 					PlayState.storyDifficulty = curdiff;
@@ -351,13 +336,13 @@ class StoryMenuState extends MusicBeatState
 				}
 				else
 				{
-
-						curDifficulty = '-hard';
+					curDifficulty = '-hard';
 
 					PlayState.SONG = Song.loadFromJson(songArray[real].toLowerCase() + curDifficulty, songArray[real].toLowerCase());
 					PlayState.isStoryMode = false;
 					LoadingState.loadAndSwitchState(new PlayState());
 				}
+
 				if (songArray[real] == 'you cant run')
 				{
 					PlayState.storyPlaylist = ['you cant run', 'triple trouble'];
@@ -373,19 +358,13 @@ class StoryMenuState extends MusicBeatState
 				if (songArray[real] == 'too slow')
 				{
 					new FlxTimer().start(1, function(tmr:FlxTimer)
-						{
-							// LoadingState.loadAndSwitchState(new PlayState(), true); //save this code for the cutsceneless build of the game
-							//var video:MP4Handler = new MP4Handler();
-						//	video.playVideo(Paths.video('tooslowcutscene1'));
-						//	video.finishCallback = function()
-							//{
-								LoadingState.loadAndSwitchState(new PlayState());
-							//}
-						});
+					{
+						LoadingState.loadAndSwitchState(new PlayState());
+					});
 				}
 			}
 
-			if (FlxG.save.data.flashing)
+			if (ClientPrefs.flashing && redBOX != null)
 			{
 				FlxFlicker.flicker(redBOX, 1, 0.06, false, false, function(flick:FlxFlicker) {});
 			}
