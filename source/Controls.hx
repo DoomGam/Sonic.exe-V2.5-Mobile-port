@@ -90,11 +90,6 @@ enum Device
 	Gamepad(id:Int);
 }
 
-/**
- * Since, in many cases multiple actions should use similar keys, we don't want the
- * rebinding UI to list every action. ActionBinders are what the user percieves as
- * an input so, for instance, they can't set jump-press and jump-release to different keys.
- */
 enum Control
 {
 	UI_UP;
@@ -119,10 +114,6 @@ enum KeyboardScheme
 	Custom;
 }
 
-/**
- * A list of actions that a player would invoke via some input device.
- * Uses FlxActions to funnel various inputs to a single action.
- */
 class Controls extends FlxActionSet
 {
 	var _ui_up = new FlxActionDigital(Action.UI_UP);
@@ -164,144 +155,88 @@ class Controls extends FlxActionSet
 	public var keyboardScheme = KeyboardScheme.None;
 
 	public var UI_UP(get, never):Bool;
-
-	inline function get_UI_UP()
-		return _ui_up.check();
+	inline function get_UI_UP() return _ui_up.check();
 
 	public var UI_LEFT(get, never):Bool;
-
-	inline function get_UI_LEFT()
-		return _ui_left.check();
+	inline function get_UI_LEFT() return _ui_left.check();
 
 	public var UI_RIGHT(get, never):Bool;
-
-	inline function get_UI_RIGHT()
-		return _ui_right.check();
+	inline function get_UI_RIGHT() return _ui_right.check();
 
 	public var UI_DOWN(get, never):Bool;
-
-	inline function get_UI_DOWN()
-		return _ui_down.check();
+	inline function get_UI_DOWN() return _ui_down.check();
 
 	public var UI_UP_P(get, never):Bool;
-
-	inline function get_UI_UP_P()
-		return _ui_upP.check();
+	inline function get_UI_UP_P() return _ui_upP.check();
 
 	public var UI_LEFT_P(get, never):Bool;
-
-	inline function get_UI_LEFT_P()
-		return _ui_leftP.check();
+	inline function get_UI_LEFT_P() return _ui_leftP.check();
 
 	public var UI_RIGHT_P(get, never):Bool;
-
-	inline function get_UI_RIGHT_P()
-		return _ui_rightP.check();
+	inline function get_UI_RIGHT_P() return _ui_rightP.check();
 
 	public var UI_DOWN_P(get, never):Bool;
-
-	inline function get_UI_DOWN_P()
-		return _ui_downP.check();
+	inline function get_UI_DOWN_P() return _ui_downP.check();
 
 	public var UI_UP_R(get, never):Bool;
-
-	inline function get_UI_UP_R()
-		return _ui_upR.check();
+	inline function get_UI_UP_R() return _ui_upR.check();
 
 	public var UI_LEFT_R(get, never):Bool;
-
-	inline function get_UI_LEFT_R()
-		return _ui_leftR.check();
+	inline function get_UI_LEFT_R() return _ui_leftR.check();
 
 	public var UI_RIGHT_R(get, never):Bool;
-
-	inline function get_UI_RIGHT_R()
-		return _ui_rightR.check();
+	inline function get_UI_RIGHT_R() return _ui_rightR.check();
 
 	public var UI_DOWN_R(get, never):Bool;
-
-	inline function get_UI_DOWN_R()
-		return _ui_downR.check();
+	inline function get_UI_DOWN_R() return _ui_downR.check();
 
 	public var NOTE_UP(get, never):Bool;
-
-	inline function get_NOTE_UP()
-		return _note_up.check();
+	inline function get_NOTE_UP() return _note_up.check();
 
 	public var NOTE_LEFT(get, never):Bool;
-
-	inline function get_NOTE_LEFT()
-		return _note_left.check();
+	inline function get_NOTE_LEFT() return _note_left.check();
 
 	public var NOTE_RIGHT(get, never):Bool;
-
-	inline function get_NOTE_RIGHT()
-		return _note_right.check();
+	inline function get_NOTE_RIGHT() return _note_right.check();
 
 	public var NOTE_DOWN(get, never):Bool;
-
-	inline function get_NOTE_DOWN()
-		return _note_down.check();
+	inline function get_NOTE_DOWN() return _note_down.check();
 
 	public var NOTE_UP_P(get, never):Bool;
-
-	inline function get_NOTE_UP_P()
-		return _note_upP.check();
+	inline function get_NOTE_UP_P() return _note_upP.check();
 
 	public var NOTE_LEFT_P(get, never):Bool;
-
-	inline function get_NOTE_LEFT_P()
-		return _note_leftP.check();
+	inline function get_NOTE_LEFT_P() return _note_leftP.check();
 
 	public var NOTE_RIGHT_P(get, never):Bool;
-
-	inline function get_NOTE_RIGHT_P()
-		return _note_rightP.check();
+	inline function get_NOTE_RIGHT_P() return _note_rightP.check();
 
 	public var NOTE_DOWN_P(get, never):Bool;
-
-	inline function get_NOTE_DOWN_P()
-		return _note_downP.check();
+	inline function get_NOTE_DOWN_P() return _note_downP.check();
 
 	public var NOTE_UP_R(get, never):Bool;
-
-	inline function get_NOTE_UP_R()
-		return _note_upR.check();
+	inline function get_NOTE_UP_R() return _note_upR.check();
 
 	public var NOTE_LEFT_R(get, never):Bool;
-
-	inline function get_NOTE_LEFT_R()
-		return _note_leftR.check();
+	inline function get_NOTE_LEFT_R() return _note_leftR.check();
 
 	public var NOTE_RIGHT_R(get, never):Bool;
-
-	inline function get_NOTE_RIGHT_R()
-		return _note_rightR.check();
+	inline function get_NOTE_RIGHT_R() return _note_rightR.check();
 
 	public var NOTE_DOWN_R(get, never):Bool;
-
-	inline function get_NOTE_DOWN_R()
-		return _note_downR.check();
+	inline function get_NOTE_DOWN_R() return _note_downR.check();
 
 	public var ACCEPT(get, never):Bool;
-
-	inline function get_ACCEPT()
-		return _accept.check();
+	inline function get_ACCEPT() return _accept.check();
 
 	public var BACK(get, never):Bool;
-
-	inline function get_BACK()
-		return _back.check();
+	inline function get_BACK() return _back.check();
 
 	public var PAUSE(get, never):Bool;
-
-	inline function get_PAUSE()
-		return _pause.check();
+	inline function get_PAUSE() return _pause.check();
 
 	public var RESET(get, never):Bool;
-
-	inline function get_RESET()
-		return _reset.check();
+	inline function get_RESET() return _reset.check();
 
 	#if (haxe >= "4.0.0")
 	public function new(name, scheme = None)
@@ -522,7 +457,6 @@ class Controls extends FlxActionSet
 		super.update();
 	}
 
-	// inline
 	public function checkByName(name:Action):Bool
 	{
 		#if debug
@@ -573,12 +507,6 @@ class Controls extends FlxActionSet
 		FlxG.inputs.add(actions);
 	}
 
-	/**
-	 * Calls a function passing each action bound by the specified control
-	 * @param control
-	 * @param func
-	 * @return ->Void)
-	 */
 	function forEachBound(control:Control, func:FlxActionDigital->FlxInputState->Void)
 	{
 		switch (control)
@@ -650,4 +578,34 @@ class Controls extends FlxActionSet
 	public function copyFrom(controls:Controls, ?device:Device)
 	{
 		#if (haxe >= "4.0.0")
-		for (name => a
+		for (name => action in controls.byName)
+		{
+			for (input in action.inputs)
+			{
+				if (device == null || input.device == device)
+					byName[name].add(input);
+			}
+		}
+		#else
+		for (name in controls.byName.keys())
+		{
+			var action = controls.byName.get(name);
+			for (input in action.inputs)
+			{
+				if (device == null || input.device == device)
+					byName.get(name).add(input);
+			}
+		}
+		#end
+
+		switch (device)
+		{
+			case Keys:
+				keyboardScheme = controls.keyboardScheme;
+			case Gamepad(id):
+				gamepadsAdded.push(id);
+			case null:
+				keyboardScheme = controls.keyboardScheme;
+				gamepadsAdded = controls.gamepadsAdded.copy();
+		}
+	}
