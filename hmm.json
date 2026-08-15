@@ -1,6 +1,11 @@
 {
   "dependencies": [
     {
+      "name": "hscript",
+      "type": "haxelib",
+      "version": "2.5.0"
+    },
+    {
       "name": "astc-compressor",
       "type": "git",
       "dir": null,
