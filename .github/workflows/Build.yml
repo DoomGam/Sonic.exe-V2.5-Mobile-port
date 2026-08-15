@@ -3,8 +3,6 @@ name: Build Android
 on:
   push:
     branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
   workflow_dispatch:
 
 jobs:
@@ -15,58 +13,41 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Java JDK
+      - name: Setup Java JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Android NDK & SDK
-        uses: nmethod25/setup-android-sdk-ndk@v1
-        with:
-          ndk-version: '25.2.9519653'
+      - name: Setup Android NDK (Via SDK Manager)
+        run: |
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "ndk;25.2.9519653"
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/25.2.9519653" >> $GITHUB_ENV
 
       - name: Setup Haxe
         uses: krdlab/setup-haxe@v1
         with:
           haxe-version: 4.2.5
 
-      - name: Cache Haxe Libraries
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.haxelib
-            export/release/android/haxe
-            export/release/android/obj
-          key: ${{ runner.os }}-android-haxe-cache-${{ hashFiles('**/project.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-android-haxe-cache-
-
-      - name: Install Haxelibs (Versões Exatas)
+      - name: Install Haxelibs
         run: |
           haxelib setup ~/haxelib
           haxelib install lime 7.9.0 --quiet
           haxelib install openfl 9.2.1 --quiet
           haxelib install flixel 4.11.0 --quiet
-          haxelib install flixel-tools 1.5.1 --quiet
           haxelib install flixel-addons 2.11.0 --quiet
           haxelib install flixel-ui 2.4.0 --quiet
           haxelib install hscript 2.5.0 --quiet
           haxelib install hxcpp 4.2.1 --quiet
-          
-          # Configura e ativa as versões principais do Lime/OpenFL
-          haxelib run lime setup
-          haxelib run lime setup flixel
-          
-          # Instalação das libs específicas para Android
           haxelib git linc_luajit https://github.com/superpowers04/linc_luajit --quiet
           haxelib git extension-androidtools https://github.com/Maysonet/extension-androidtools --quiet
+          haxelib run lime setup -y
+          haxelib run lime setup flixel
 
       - name: Configure Lime Android
         run: |
           haxelib run lime config ANDROID_SDK $ANDROID_HOME
-          haxelib run lime config ANDROID_NDK_ROOT $ANDROID_NDK_LATEST_HOME
-          haxelib run lime config JAVA_HOME $JAVA_HOME_17_X64
+          haxelib run lime config ANDROID_NDK_ROOT $ANDROID_HOME/ndk/25.2.9519653
 
       - name: Compile APK
         run: |
